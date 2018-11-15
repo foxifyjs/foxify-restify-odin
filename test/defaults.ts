@@ -93,12 +93,34 @@ class User extends Odin {
   };
 }
 
-it("Should limit 1 item", async () => {
+it("Should limit 1 item by default", async () => {
   expect.assertions(2);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
+  app.get("/users", restify(User, { limit: 1 }), async (req, res) => {
+    expect(req.fro).toBeDefined();
+
+    res.json({
+      users: await req.fro.query.get(),
+      total: await req.fro.counter.count(),
+    });
+  });
+
+  const result = await app.inject(`/users`);
+
+  const users = ITEMS.initial();
+
+  expect(JSON.parse(result.body))
+    .toEqual({ users, total: ITEMS.length });
+});
+
+it("Should skip 1 item by default and sort by -age", async () => {
+  expect.assertions(2);
+
+  const app = new Foxify();
+
+  app.get("/users", restify(User, { skip: 1 }), async (req, res) => {
     expect(req.fro).toBeDefined();
 
     res.json({
@@ -109,11 +131,13 @@ it("Should limit 1 item", async () => {
 
   const result = await app.inject(`/users?${stringify(
     {
-      limit: 1,
+      sort: [
+        "-age",
+      ],
     },
   )}`);
 
-  const users = ITEMS.initial();
+  const users = ITEMS.orderBy("age", "desc").tail();
 
   expect(JSON.parse(result.body))
     .toEqual({ users, total: ITEMS.length });

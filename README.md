@@ -71,6 +71,32 @@ app.start();
 
 ## Documentation
 
+```typescript
+type Operator = "lt" | "lte" | "eq" | "ne" | "gte" | "gt" |
+  "ex" | "in" | "nin" | "bet" | "nbe";
+
+interface FilterObject {
+  field: string;
+  operator: Operator;
+  value: string | number | boolean | any[] | object | Date;
+}
+
+interface Filter {
+  and?: Array<FilterObject | Filter>;
+  or?: Array<FilterObject | Filter>;
+}
+
+interface Query {
+  filter?: Filter | FilterObject;
+  include?: string[];
+  sort?: string[];
+  skip?: number;
+  limit?: number;
+}
+
+restify(Model: typeof Odin, defaults?: Query): Foxify.Handler;
+```
+
 This middleware parses url query string and executes a query on the given model accordingly and passes the `query` to you (since you might need to do some modifications on the query, too)
 
 It also passes a `counter` which is exactly like `query` but without applying `skip`, `limit`, `sort` just because you might want to send a total count in your response as well

@@ -93,7 +93,7 @@ class User extends Odin {
   };
 }
 
-it("Should skip 1", async () => {
+it("Should skip 1 item", async () => {
   expect.assertions(2);
 
   const app = new Foxify();
@@ -114,6 +114,32 @@ it("Should skip 1", async () => {
   )}`);
 
   const users = ITEMS.tail();
+
+  expect(JSON.parse(result.body))
+    .toEqual({ users, total: ITEMS.length });
+});
+
+it("Should skip 0 item", async () => {
+  expect.assertions(2);
+
+  const app = new Foxify();
+
+  app.get("/users", restify(User), async (req, res) => {
+    expect(req.fro).toBeDefined();
+
+    res.json({
+      users: await req.fro.query.get(),
+      total: await req.fro.counter.count(),
+    });
+  });
+
+  const result = await app.inject(`/users?${stringify(
+    {
+      skip: 0,
+    },
+  )}`);
+
+  const users = ITEMS;
 
   expect(JSON.parse(result.body))
     .toEqual({ users, total: ITEMS.length });

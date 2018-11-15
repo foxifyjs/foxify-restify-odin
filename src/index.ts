@@ -20,15 +20,15 @@ namespace restify {
   }
 
   export interface Query {
-    filter: Filter | FilterObject;
-    include: string[];
-    sort: string[];
-    skip: number;
-    limit: number;
+    filter?: Filter | FilterObject;
+    include?: string[];
+    sort?: string[];
+    skip?: number;
+    limit?: number;
   }
 }
 
-const restify = (model: typeof Odin) => {
+const restify = (model: typeof Odin, defaults: restify.Query = {}) => {
   if (!(typeof model === typeof Odin)) {
     throw new TypeError("Expected model to be a Odin database model");
   }
@@ -37,7 +37,7 @@ const restify = (model: typeof Odin) => {
   const foxify_restify_odin: Foxify.Handler = (req, res, next) => {
     const parsed = parse((req.url as string).replace(/^.*\?/, ""));
 
-    const decoded = decoder(parsed) as restify.Query;
+    const decoded = Object.assign({}, defaults, decoder(parsed));
 
     req.fro = {
       decoded,
