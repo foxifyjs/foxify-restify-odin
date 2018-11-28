@@ -6,7 +6,7 @@ import query from "./query";
 
 namespace restify {
   export type Operator = "lt" | "lte" | "eq" | "ne" | "gte" | "gt" |
-    "ex" | "in" | "nin" | "bet" | "nbe";
+    "ex" | "in" | "nin" | "bet" | "nbe" | "lk" | "nlk";
 
   export interface FilterObject {
     field: string;
@@ -34,7 +34,7 @@ const restify = (model: typeof Odin, defaults: restify.Query = {}) => {
   }
 
   // tslint:disable-next-line:variable-name
-  const foxify_restify_odin: Foxify.Handler = (req, res, next) => {
+  const foxifyRestifyOdin: Foxify.Handler = function foxify_restify_odin(req, res, next) {
     const parsed = parse((req.url as string).replace(/^.*\?/, ""));
 
     const decoded = Object.assign({}, defaults, decoder(parsed));
@@ -47,7 +47,7 @@ const restify = (model: typeof Odin, defaults: restify.Query = {}) => {
     next();
   };
 
-  return foxify_restify_odin;
+  return foxifyRestifyOdin;
 };
 
 export = restify;

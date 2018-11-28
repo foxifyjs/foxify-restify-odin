@@ -30,6 +30,10 @@ const operate = (query: typeof Odin, field: string, operator: Operator, value: a
       return query.whereBetween(field, value[0], value[1]);
     case "nbe":
       return query.whereNotBetween(field, value[0], value[1]);
+    case "lk":
+      return query.whereLike(field, value);
+    case "nlk":
+      return query.whereNotLike(field, value);
     default:
       throw new TypeError("Unknown operator");
   }

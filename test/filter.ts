@@ -300,3 +300,33 @@ it("Should filter (5)", async () => {
   expect(JSON.parse(result.body))
     .toEqual({ users, total: users.length });
 });
+
+it("Should filter (6)", async () => {
+  expect.assertions(2);
+
+  const app = new Foxify();
+
+  app.get("/users", restify(User), async (req, res) => {
+    expect(req.fro).toBeDefined();
+
+    res.json({
+      users: await req.fro.query.get(),
+      total: await req.fro.counter.count(),
+    });
+  });
+
+  const result = await app.inject(`/users?${stringify(
+    {
+      filter: {
+        field: "name.first",
+        operator: "lk",
+        value: "arda",
+      },
+    },
+  )}`);
+
+  const users = ITEMS.filter(({ name }) => /arda/i.test(name.first));
+
+  expect(JSON.parse(result.body))
+    .toEqual({ users, total: users.length });
+});
