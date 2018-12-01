@@ -35,20 +35,19 @@ const ITEMS = [
   },
 ];
 
-Odin.connections({
+Odin.Connect({
   default: {
-    driver: "MongoDB",
     database: global.__MONGO_DB_NAME__,
     connection: global.__MONGO_CONNECTION__,
   },
 });
 
 beforeAll((done) => {
-  Odin.DB.table(TABLE).insert(ITEMS, (err) => {
+  Odin.DB.collection(TABLE).insert(ITEMS, (err) => {
     if (err) throw err;
 
-    Odin.DB.table(TABLE).get((err, items) => {
-      if (err) throw err;
+    Odin.DB.collection(TABLE).get((err2, items) => {
+      if (err2) throw err2;
 
       ITEMS.length = 0;
 
@@ -60,11 +59,11 @@ beforeAll((done) => {
 });
 
 afterEach((done) => {
-  Odin.DB.table(TABLE).delete((err) => {
+  Odin.DB.collection(TABLE).delete((err) => {
     if (err) throw err;
 
-    Odin.DB.table(TABLE).insert(ITEMS, (err) => {
-      if (err) throw err;
+    Odin.DB.collection(TABLE).insert(ITEMS, (err2) => {
+      if (err2) throw err2;
 
       done();
     });
@@ -72,23 +71,23 @@ afterEach((done) => {
 });
 
 afterAll((done) => {
-  Odin.DB.table(TABLE).delete((err) => {
+  Odin.DB.collection(TABLE).delete((err) => {
     if (err) throw err;
 
     done();
   });
 });
 
-interface User extends Odin { }
+const Types = Odin.Types;
 
 class User extends Odin {
   public static schema = {
-    email: User.Types.String.email.required,
-    username: User.Types.String.alphanum.min(3).required,
-    age: User.Types.Number.min(18).required,
+    email: Types.string.email.required,
+    username: Types.string.alphanum.min(3).required,
+    age: Types.number.min(18).required,
     name: {
-      first: User.Types.String.min(3).required,
-      last: User.Types.String.min(3),
+      first: Types.string.min(3).required,
+      last: Types.string.min(3),
     },
   };
 }

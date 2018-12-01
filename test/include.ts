@@ -45,26 +45,25 @@ const ITEMS2 = [
   },
 ];
 
-Odin.connections({
+Odin.Connect({
   default: {
-    driver: "MongoDB",
     database: global.__MONGO_DB_NAME__,
     connection: global.__MONGO_CONNECTION__,
   },
 });
 
 beforeAll(async (done) => {
-  await Odin.DB.table(TABLE).insert(ITEMS);
+  await Odin.DB.collection(TABLE).insert(ITEMS);
 
-  const items = await Odin.DB.table(TABLE).get();
+  const items = await Odin.DB.collection(TABLE).get();
 
   ITEMS.length = 0;
 
   ITEMS.push(...items);
 
-  await Odin.DB.table(TABLE2).insert(ITEMS2);
+  await Odin.DB.collection(TABLE2).insert(ITEMS2);
 
-  const items2 = await Odin.DB.table(TABLE2).get();
+  const items2 = await Odin.DB.collection(TABLE2).get();
 
   ITEMS2.length = 0;
 
@@ -74,59 +73,57 @@ beforeAll(async (done) => {
 });
 
 afterEach(async (done) => {
-  await Odin.DB.table(TABLE).delete();
+  await Odin.DB.collection(TABLE).delete();
 
-  await Odin.DB.table(TABLE).insert(ITEMS);
+  await Odin.DB.collection(TABLE).insert(ITEMS);
 
-  await Odin.DB.table(TABLE2).delete();
+  await Odin.DB.collection(TABLE2).delete();
 
-  await Odin.DB.table(TABLE2).insert(ITEMS2);
+  await Odin.DB.collection(TABLE2).insert(ITEMS2);
 
   done();
 });
 
 afterAll(async (done) => {
-  await Odin.DB.table(TABLE).delete();
+  await Odin.DB.collection(TABLE).delete();
 
-  await Odin.DB.table(TABLE2).delete();
+  await Odin.DB.collection(TABLE2).delete();
 
   done();
 });
 
-interface User extends Odin { }
+const Types = Odin.Types;
 
+@Odin.register
 class User extends Odin {
   public static schema = {
-    email: User.Types.String.email.required,
-    username: User.Types.String.alphanum.min(3).required,
+    email: Types.string.email.required,
+    username: Types.string.alphanum.min(3).required,
     name: {
-      first: User.Types.String.min(3).required,
-      last: User.Types.String.min(3),
+      first: Types.string.min(3).required,
+      last: Types.string.min(3),
     },
   };
 
+  @Odin.relation
   public age() {
     return this.hasOne<Age>("Age", "username", "username");
   }
 }
 
-Odin.register(User);
-
-interface Age extends Odin { }
-
 // tslint:disable-next-line:max-classes-per-file
+@Odin.register
 class Age extends Odin {
   public static schema = {
-    username: User.Types.String.alphanum.min(3).required,
-    age: User.Types.Number.min(18).required,
+    username: Types.string.alphanum.min(3).required,
+    age: Types.number.min(18).required,
   };
 
+  @Odin.relation
   public user() {
     return this.hasOne<User>("User", "username", "username");
   }
 }
-
-Odin.register(Age);
 
 it("Should include age", async () => {
   expect.assertions(2);
