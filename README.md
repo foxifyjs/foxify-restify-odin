@@ -73,7 +73,7 @@ app.start();
 
 ```typescript
 type Operator = "lt" | "lte" | "eq" | "ne" | "gte" | "gt" |
-  "ex" | "in" | "nin" | "bet" | "nbe";
+  "ex" | "in" | "nin" | "bet" | "nbe" | "lk" | "nlk";
 
 interface FilterObject {
   field: string;

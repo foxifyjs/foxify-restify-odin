@@ -37,11 +37,11 @@
     "qs": "^6.6.0"
   },
   "peerDependencies": {
-    "@foxify/odin": ">=0.5.1",
+    "@foxify/odin": ">=0.5.2",
     "foxify": ">=0.10.18"
   },
   "devDependencies": {
-    "@foxify/odin": "^0.5.1",
+    "@foxify/odin": "^0.5.2",
     "@types/jest": "^23.3.10",
     "@types/qs": "^6.5.1",
     "codecov": "^3.1.0",
