@@ -1,7 +1,11 @@
 import * as Odin from "@foxify/odin";
 import * as Foxify from "foxify";
+import { Router } from "foxify/framework/routing";
+import * as pluralize from "prototyped.js/es6/string/pluralize/method";
 import { parse } from "qs";
-import { index, responder } from "./controllers";
+import {
+  count, delete as deleteController, index, responder, show, store, update,
+} from "./controllers";
 import decoder from "./decoder";
 import query from "./query";
 
@@ -29,7 +33,6 @@ namespace restify {
   }
 
   export interface RouteOptions {
-    lean?: boolean;
     pre?: Foxify.Handler;
     post?: Foxify.Handler;
   }
@@ -39,7 +42,7 @@ namespace restify {
     prefix: string;
     defaults: Query;
     routes: {
-      index: RouteOptions | false;
+      index: RouteOptions & { lean?: boolean; } | false;
       count: RouteOptions | false;
       store: RouteOptions | false;
       show: RouteOptions | false;
@@ -73,7 +76,6 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
     },
   };
 
-  // tslint:disable-next-line:variable-name
   const foxifyRestifyOdin: Foxify.Handler = function foxify_restify_odin(req, res, next) {
     const parsed = parse((req.url as string).replace(/^.*\?/, ""));
 
@@ -87,7 +89,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
     next();
   };
 
-  const router = new Foxify.Router(`/${options.name}`);
+  const router = new Router(`${options.prefix}/${options.name}`);
 
   const routes = options.routes as restify.Options["routes"];
 
@@ -102,7 +104,60 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
     );
   }
 
-  return foxifyRestifyOdin;
+  if (routes.count) {
+    router.get(
+      "/count",
+      foxifyRestifyOdin,
+      routes.count.pre as any,
+      count(options as restify.Options),
+      routes.count.post as any,
+      responder,
+    );
+  }
+
+  if (routes.store) {
+    router.post(
+      "",
+      routes.store.pre as any,
+      store(model, options as restify.Options),
+      routes.store.post as any,
+      responder,
+    );
+  }
+
+  const name = pluralize(options.name as string, 1);
+
+  if (routes.show) {
+    router.get(
+      `/:${name}`,
+      routes.show.pre as any,
+      show(model, options as restify.Options),
+      routes.show.post as any,
+      responder,
+    );
+  }
+
+  if (routes.update) {
+    router.get(
+      `/:${name}`,
+      routes.update.pre as any,
+      update(model, options as restify.Options),
+      routes.update.post as any,
+      responder,
+    );
+  }
+
+  if (routes.delete) {
+    router.get(
+      `/:${name}`,
+      routes.delete.pre as any,
+      deleteController(model, options as restify.Options),
+      routes.delete.post as any,
+      responder,
+    );
+  }
+
+  return router;
 };
 
 export = restify;
