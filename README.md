@@ -41,8 +41,8 @@ Easily restify odin databases
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/en/download) `8.12` or higher is required.
-- [foxify](https://github.com/foxifyjs/foxify) `0.10.14` or higher is required.
-- [@foxify/odin](https://github.com/foxifyjs/odin) `0.2.2` or higher is required.
+- [foxify](https://github.com/foxifyjs/foxify) `0.10.20` or higher is required.
+- [@foxify/odin](https://github.com/foxifyjs/odin) `0.6.0` or higher is required.
 
 ### Installation
 
