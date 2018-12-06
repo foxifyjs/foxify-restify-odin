@@ -1,8 +1,8 @@
 import * as Odin from "@foxify/odin";
+import * as bodyParser from "body-parser";
 import * as Foxify from "foxify";
 import "prototyped.js";
-import { stringify } from "qs";
-import * as restify from "../src";
+import * as restify from "../../src";
 
 declare global {
   namespace NodeJS {
@@ -92,44 +92,30 @@ class User extends Odin {
   };
 }
 
-it("Should limit 1 item by default", async () => {
-  expect.assertions(1);
+it("Should delete the user by the given id", async () => {
+  expect.assertions(2);
 
   const app = new Foxify();
 
-  app.use(restify(User, { defaults: { limit: 1 } }));
+  app.use(restify(User));
 
-  const result = await app.inject(`/users`);
+  const user = ITEMS[0];
 
-  const users = ITEMS.initial();
+  const deleted = await app.inject({
+    url: `/users/${(user as any).id}`,
+    method: "DELETE",
+  });
+
+  expect(JSON.parse(deleted.body))
+    .toEqual({ message: "User deleted successfully" });
+
+  const users = ITEMS.tail();
+
+  const result = await app.inject("/users");
 
   expect(JSON.parse(result.body))
     .toEqual({
       users,
-      meta: { limit: 1, page: 0, count: users.length, total_count: ITEMS.length },
-    });
-});
-
-it("Should skip 1 item by default and sort by -age", async () => {
-  expect.assertions(1);
-
-  const app = new Foxify();
-
-  app.use(restify(User, { defaults: { skip: 1 } }));
-
-  const result = await app.inject(`/users?${stringify(
-    {
-      sort: [
-        "-age",
-      ],
-    },
-  )}`);
-
-  const users = ITEMS.orderBy("age", "desc").tail();
-
-  expect(JSON.parse(result.body))
-    .toEqual({
-      users,
-      meta: { limit: 10, page: 0, count: users.length, total_count: ITEMS.length },
+      meta: { limit: 10, page: 0, count: users.length, total_count: users.length },
     });
 });

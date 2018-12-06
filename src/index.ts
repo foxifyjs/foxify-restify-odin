@@ -37,34 +37,37 @@ namespace restify {
     post?: Foxify.Handler;
   }
 
-  export interface Options {
+  export interface RoutesOptions {
+    index: RouteOptions & { lean?: boolean; } | false;
+    count: RouteOptions | false;
+    store: RouteOptions | false;
+    show: RouteOptions | false;
+    update: RouteOptions | false;
+    delete: RouteOptions | false;
+  }
+
+  export interface Options<P extends boolean = false> {
     name: string;
     prefix: string;
     defaults: Query;
-    routes: {
-      index: RouteOptions & { lean?: boolean; } | false;
-      count: RouteOptions | false;
-      store: RouteOptions | false;
-      show: RouteOptions | false;
-      update: RouteOptions | false;
-      delete: RouteOptions | false;
-    };
+    routes: P extends true ? Partial<RoutesOptions> : RoutesOptions;
   }
 }
 
-const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => {
+const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {}) => {
   if (!(typeof model === typeof Odin)) {
     throw new TypeError("Expected model to be a Odin database model");
   }
 
   options = {
-    name: model.name,
+    name: model.toString(),
     prefix: "",
-    defaults: {
-      limit: 0,
-      skip: 0,
-    },
     ...options,
+    defaults: {
+      limit: 10,
+      skip: 0,
+      ...(options.defaults || {}),
+    },
     routes: {
       index: {},
       count: {},
@@ -76,18 +79,19 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
     },
   };
 
-  const foxifyRestifyOdin: Foxify.Handler = function foxify_restify_odin(req, res, next) {
-    const parsed = parse((req.url as string).replace(/^.*\?/, ""));
+  const foxifyRestifyOdin: (single?: boolean) => Foxify.Handler = (single = false) =>
+    function foxify_restify_odin(req, res, next) {
+      const parsed = parse((req.url as string).replace(/^.*\?/, ""));
 
-    const decoded = Object.assign({}, options.defaults, decoder(parsed));
+      const decoded = Object.assign({}, options.defaults, decoder(parsed));
 
-    req.fro = {
-      decoded,
-      ...query(model, decoded),
+      req.fro = {
+        decoded,
+        ...query(model, decoded, single),
+      };
+
+      next();
     };
-
-    next();
-  };
 
   const router = new Router(`${options.prefix}/${options.name}`);
 
@@ -96,7 +100,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
   if (routes.index) {
     router.get(
       "",
-      foxifyRestifyOdin,
+      foxifyRestifyOdin(),
       routes.index.pre as any,
       index(options as restify.Options),
       routes.index.post as any,
@@ -107,7 +111,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
   if (routes.count) {
     router.get(
       "/count",
-      foxifyRestifyOdin,
+      foxifyRestifyOdin(),
       routes.count.pre as any,
       count(options as restify.Options),
       routes.count.post as any,
@@ -130,6 +134,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
   if (routes.show) {
     router.get(
       `/:${name}`,
+      // foxifyRestifyOdin(true),
       routes.show.pre as any,
       show(model, options as restify.Options),
       routes.show.post as any,
@@ -138,7 +143,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
   }
 
   if (routes.update) {
-    router.get(
+    router.patch(
       `/:${name}`,
       routes.update.pre as any,
       update(model, options as restify.Options),
@@ -148,7 +153,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options> = {}) => 
   }
 
   if (routes.delete) {
-    router.get(
+    router.delete(
       `/:${name}`,
       routes.delete.pre as any,
       deleteController(model, options as restify.Options),

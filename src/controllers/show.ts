@@ -9,8 +9,14 @@ export default (model: typeof Odin, options: Options): Foxify.Handler => {
   return async function foxify_restify_odin_show(req, res, next) {
     const id = req.params[name];
 
-    req.fro.result = {
-      [name]: Odin.isOdin(id) ? id : await model.find(id),
+    // req.fro.result = {
+    //   [name]: Odin.isOdin(id) ? id : await model.find(id),
+    // };
+
+    req.fro = {
+      result: {
+        [name]: Odin.isOdin(id) ? id : await model.find(id),
+      },
     };
 
     next();

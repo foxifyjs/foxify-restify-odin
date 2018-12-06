@@ -12,6 +12,10 @@
 
 ---
 
+## [v1.3.0](https://github.com/foxifyjs/foxify-restify-odin/releases/tag/v1.3.0) - *(2018-12-06)*
+
+- :zap: Automatically create rest routes
+
 ## [v1.1.1](https://github.com/foxifyjs/foxify-restify-odin/releases/tag/v1.1.1) - *(2018-11-29)*
 
 - :zap: Added `lk` and `nlk` to filter operators

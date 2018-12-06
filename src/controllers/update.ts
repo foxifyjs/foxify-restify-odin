@@ -17,8 +17,10 @@ export default (model: typeof Odin, options: Options): Foxify.Handler => {
       item[key] = value;
     });
 
-    req.fro.result = {
-      [name]: await item.save(),
+    req.fro = {
+      result: {
+        [name]: await item.save(),
+      },
     };
 
     next();

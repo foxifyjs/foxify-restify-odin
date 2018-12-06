@@ -2,7 +2,7 @@ import * as Odin from "@foxify/odin";
 import * as Foxify from "foxify";
 import "prototyped.js";
 import { stringify } from "qs";
-import * as restify from "../src";
+import * as restify from "../../src";
 
 declare global {
   namespace NodeJS {
@@ -92,40 +92,42 @@ class User extends Odin {
   };
 }
 
-it("Should limit 1 item by default", async () => {
+it("Should skip 1 item", async () => {
   expect.assertions(1);
 
   const app = new Foxify();
 
-  app.use(restify(User, { defaults: { limit: 1 } }));
+  app.use(restify(User));
 
-  const result = await app.inject(`/users`);
+  const result = await app.inject(`/users?${stringify(
+    {
+      skip: 1,
+    },
+  )}`);
 
-  const users = ITEMS.initial();
+  const users = ITEMS.tail();
 
   expect(JSON.parse(result.body))
     .toEqual({
       users,
-      meta: { limit: 1, page: 0, count: users.length, total_count: ITEMS.length },
+      meta: { limit: 10, page: 0, count: users.length, total_count: ITEMS.length },
     });
 });
 
-it("Should skip 1 item by default and sort by -age", async () => {
+it("Should skip 0 item", async () => {
   expect.assertions(1);
 
   const app = new Foxify();
 
-  app.use(restify(User, { defaults: { skip: 1 } }));
+  app.use(restify(User));
 
   const result = await app.inject(`/users?${stringify(
     {
-      sort: [
-        "-age",
-      ],
+      skip: 0,
     },
   )}`);
 
-  const users = ITEMS.orderBy("age", "desc").tail();
+  const users = ITEMS;
 
   expect(JSON.parse(result.body))
     .toEqual({

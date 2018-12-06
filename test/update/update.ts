@@ -1,8 +1,8 @@
 import * as Odin from "@foxify/odin";
+import * as bodyParser from "body-parser";
 import * as Foxify from "foxify";
 import "prototyped.js";
-import { stringify } from "qs";
-import * as restify from "../src";
+import * as restify from "../../src";
 
 declare global {
   namespace NodeJS {
@@ -92,54 +92,39 @@ class User extends Odin {
   };
 }
 
-it("Should skip 1 item", async () => {
+it("Should update the user by the given id", async () => {
   expect.assertions(2);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
+  app.use(
+    bodyParser.json(),
+    bodyParser.urlencoded({ extended: false }),
+    restify(User),
+  );
 
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
+  const user = ITEMS[0];
+
+  user.username = "updated";
+
+  const saved = await app.inject({
+    url: `/users/${(user as any).id}`,
+    method: "PATCH",
+    body: { user: { username: "updated" } },
   });
 
-  const result = await app.inject(`/users?${stringify(
-    {
-      skip: 1,
-    },
-  )}`);
+  expect({ user: JSON.parse(saved.body).user.$omit(["updated_at"]) })
+    .toEqual({ user });
 
-  const users = ITEMS.tail();
+  (user as any).updated_at = JSON.parse(saved.body).user.updated_at;
+
+  const users = [user].concat(ITEMS.tail());
+
+  const result = await app.inject("/users");
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: ITEMS.length });
-});
-
-it("Should skip 0 item", async () => {
-  expect.assertions(2);
-
-  const app = new Foxify();
-
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
-
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
+    .toEqual({
+      users,
+      meta: { limit: 10, page: 0, count: users.length, total_count: users.length },
     });
-  });
-
-  const result = await app.inject(`/users?${stringify(
-    {
-      skip: 0,
-    },
-  )}`);
-
-  const users = ITEMS;
-
-  expect(JSON.parse(result.body))
-    .toEqual({ users, total: ITEMS.length });
 });

@@ -1,8 +1,8 @@
 import * as Odin from "@foxify/odin";
+import * as bodyParser from "body-parser";
 import * as Foxify from "foxify";
 import "prototyped.js";
-import { stringify } from "qs";
-import * as restify from "../src";
+import * as restify from "../../src";
 
 declare global {
   namespace NodeJS {
@@ -92,58 +92,43 @@ class User extends Odin {
   };
 }
 
-it("Should sort by age [asc]", async () => {
+it("Should store the new user", async () => {
   expect.assertions(2);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
+  app.use(
+    bodyParser.json(),
+    bodyParser.urlencoded({ extended: false }),
+    restify(User),
+  );
 
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
+  const user = {
+    email: "johndue2@example.com",
+    username: "john2",
+    age: 40,
+    name: {
+      first: "John 2",
+      last: "Due",
+    },
+  };
+
+  const saved = await app.inject({
+    url: "/users",
+    method: "POST",
+    body: { user },
   });
 
-  const result = await app.inject(`/users?${stringify(
-    {
-      sort: [
-        "age",
-      ],
-    },
-  )}`);
+  expect({ user: JSON.parse(saved.body).user.$omit(["id", "created_at"]) })
+    .toEqual({ user });
 
-  const users = ITEMS.orderBy("age");
+  const users = ITEMS.concat([JSON.parse(saved.body).user]);
+
+  const result = await app.inject("/users");
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: ITEMS.length });
-});
-
-it("Should sort by age [desc]", async () => {
-  expect.assertions(2);
-
-  const app = new Foxify();
-
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
-
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
+    .toEqual({
+      users,
+      meta: { limit: 10, page: 0, count: users.length, total_count: users.length },
     });
-  });
-
-  const result = await app.inject(`/users?${stringify(
-    {
-      sort: [
-        "-age",
-      ],
-    },
-  )}`);
-
-  const users = ITEMS.orderBy("age", "desc");
-
-  expect(JSON.parse(result.body))
-    .toEqual({ users, total: ITEMS.length });
 });

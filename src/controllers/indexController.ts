@@ -14,12 +14,15 @@ export default (options: Options): Foxify.Handler => {
 
     const limit = decoded.limit;
 
+    let page = Math.floor(decoded.skip / limit);
+    if (!page || page === Infinity) page = 0;
+
     req.fro.result = {
       [name]: items,
       meta: {
         limit,
-        page: Math.floor(decoded.skip / limit),
-        page_count: items.length,
+        page,
+        count: items.length,
         total_count: await counter.count(),
       },
     };

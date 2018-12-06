@@ -14,8 +14,10 @@ export default (model: typeof Odin, options: Options): Foxify.Handler => {
     if (Odin.isOdin(id)) await model.destroy(id.id as string);
     else await model.destroy(id);
 
-    req.fro.result = {
-      message: `${capitalized} deleted successfully`,
+    req.fro = {
+      result: {
+        message: `${capitalized} deleted successfully`,
+      },
     };
 
     next();

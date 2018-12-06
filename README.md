@@ -94,10 +94,31 @@ interface Query {
   limit?: number;
 }
 
-restify(Model: typeof Odin, defaults?: Query): Foxify.Handler;
+interface RouteOptions {
+  pre?: Foxify.Handler;
+  post?: Foxify.Handler;
+}
+
+interface RoutesOptions {
+  index: RouteOptions & { lean?: boolean; } | false;
+  count: RouteOptions | false;
+  store: RouteOptions | false;
+  show: RouteOptions | false;
+  update: RouteOptions | false;
+  delete: RouteOptions | false;
+}
+
+interface Options {
+  name: string;
+  prefix: string;
+  defaults: Query;
+  routes: Partial<RoutesOptions>;
+}
+
+restify(model: typeof Odin, options: Partial<restify.Options> = {}): Router;
 ```
 
-This middleware parses url query string and executes a query on the given model accordingly and passes the `query` to you (since you might need to do some modifications on the query, too)
+This module's middleware parses url query string and executes a query on the given model accordingly and passes the `query` to you (since you might need to do some modifications on the query, too)
 
 It also passes a `counter` which is exactly like `query` but without applying `skip`, `limit`, `sort` just because you might want to send a total count in your response as well
 
@@ -153,7 +174,7 @@ filter can be a single filter object or `and`/`or` of Array\<filter object\>
 
 possible operators:
 
-`lt` | `lte` | `eq` | `ne` | `gte` | `gt` | `ex` | `in` | `nin` | `bet` | `nbe`
+`lt` | `lte` | `eq` | `ne` | `gte` | `gt` | `ex` | `in` | `nin` | `bet` | `nbe` | `lk` | `nlk`
 
 ### include
 

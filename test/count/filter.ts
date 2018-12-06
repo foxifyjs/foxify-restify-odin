@@ -2,7 +2,7 @@ import * as Odin from "@foxify/odin";
 import * as Foxify from "foxify";
 import "prototyped.js";
 import { stringify } from "qs";
-import * as restify from "../src";
+import * as restify from "../../src";
 
 declare global {
   namespace NodeJS {
@@ -93,20 +93,13 @@ class User extends Odin {
 }
 
 it("Should filter (1)", async () => {
-  expect.assertions(2);
+  expect.assertions(1);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
+  app.use(restify(User));
 
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
-  });
-
-  const result = await app.inject(`/users?${stringify(
+  const result = await app.inject(`/users/count?${stringify(
     {
       filter: {
         field: "age",
@@ -119,24 +112,19 @@ it("Should filter (1)", async () => {
   const users = ITEMS.filter(({ age }) => age === 22);
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: users.length });
+    .toEqual({
+      users: users.length,
+    });
 });
 
 it("Should filter (2)", async () => {
-  expect.assertions(2);
+  expect.assertions(1);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
+  app.use(restify(User));
 
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
-  });
-
-  const result = await app.inject(`/users?${stringify(
+  const result = await app.inject(`/users/count?${stringify(
     {
       filter: {
         and: [
@@ -158,24 +146,19 @@ it("Should filter (2)", async () => {
   const users = ITEMS.filter(({ username, age }) => age === 22 && username !== "ardalan");
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: users.length });
+    .toEqual({
+      users: users.length,
+    });
 });
 
 it("Should filter (3)", async () => {
-  expect.assertions(2);
+  expect.assertions(1);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
+  app.use(restify(User));
 
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
-  });
-
-  const result = await app.inject(`/users?${stringify(
+  const result = await app.inject(`/users/count?${stringify(
     {
       filter: {
         or: [
@@ -197,24 +180,19 @@ it("Should filter (3)", async () => {
   const users = ITEMS.filter(({ username, age }) => age === 22 || username !== "ardalan");
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: users.length });
+    .toEqual({
+      users: users.length,
+    });
 });
 
 it("Should filter (4)", async () => {
-  expect.assertions(2);
+  expect.assertions(1);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
+  app.use(restify(User));
 
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
-  });
-
-  const result = await app.inject(`/users?${stringify(
+  const result = await app.inject(`/users/count?${stringify(
     {
       filter: {
         or: [
@@ -247,24 +225,19 @@ it("Should filter (4)", async () => {
   ));
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: users.length });
+    .toEqual({
+      users: users.length,
+    });
 });
 
 it("Should filter (5)", async () => {
-  expect.assertions(2);
+  expect.assertions(1);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
+  app.use(restify(User));
 
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
-  });
-
-  const result = await app.inject(`/users?${stringify(
+  const result = await app.inject(`/users/count?${stringify(
     {
       filter: {
         and: [
@@ -297,24 +270,19 @@ it("Should filter (5)", async () => {
   ));
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: users.length });
+    .toEqual({
+      users: users.length,
+    });
 });
 
 it("Should filter (6)", async () => {
-  expect.assertions(2);
+  expect.assertions(1);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
+  app.use(restify(User));
 
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
-  });
-
-  const result = await app.inject(`/users?${stringify(
+  const result = await app.inject(`/users/count?${stringify(
     {
       filter: {
         field: "name.first",
@@ -327,5 +295,7 @@ it("Should filter (6)", async () => {
   const users = ITEMS.filter(({ name }) => /arda/i.test(name.first));
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: users.length });
+    .toEqual({
+      users: users.length,
+    });
 });

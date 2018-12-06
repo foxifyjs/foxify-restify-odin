@@ -9,8 +9,10 @@ export default (model: typeof Odin, options: Options): Foxify.Handler => {
   return async function foxify_restify_odin_store(req, res, next) {
     const item = new model(req.body[name]);
 
-    req.fro.result = {
-      [name]: await item.save(),
+    req.fro = {
+      result: {
+        [name]: await item.save(),
+      },
     };
 
     next();

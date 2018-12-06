@@ -2,7 +2,7 @@ import * as Odin from "@foxify/odin";
 import * as Foxify from "foxify";
 import "prototyped.js";
 import { stringify } from "qs";
-import * as restify from "../src";
+import * as restify from "../../src";
 
 declare global {
   namespace NodeJS {
@@ -93,18 +93,11 @@ class User extends Odin {
 }
 
 it("Should limit 1 item", async () => {
-  expect.assertions(2);
+  expect.assertions(1);
 
   const app = new Foxify();
 
-  app.get("/users", restify(User), async (req, res) => {
-    expect(req.fro).toBeDefined();
-
-    res.json({
-      users: await req.fro.query.get(),
-      total: await req.fro.counter.count(),
-    });
-  });
+  app.use(restify(User));
 
   const result = await app.inject(`/users?${stringify(
     {
@@ -115,5 +108,8 @@ it("Should limit 1 item", async () => {
   const users = ITEMS.initial();
 
   expect(JSON.parse(result.body))
-    .toEqual({ users, total: ITEMS.length });
+    .toEqual({
+      users,
+      meta: { limit: 1, page: 0, count: users.length, total_count: ITEMS.length },
+    });
 });
