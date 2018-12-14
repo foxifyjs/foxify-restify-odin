@@ -141,23 +141,25 @@ it("Should show the user by the given id", async () => {
     .toEqual({ user });
 });
 
-// it("Should show the user by the given id including its age relation", async () => {
-//   expect.assertions(1);
+it("Should show the user by the given id including its age relation", async () => {
+  expect.assertions(1);
 
-//   const app = new Foxify();
+  const app = new Foxify();
 
-//   app.use(restify(User));
+  app.use(restify(User));
 
-//   const user = ITEMS[0];
+  const user = ITEMS[0];
 
-//   const result = await app.inject(`/users/${(user as any).id}?${stringify(
-//     {
-//       include: [
-//         "age",
-//       ],
-//     },
-//   )}`);
+  (user as any).age = ITEMS2.filter(item => item.username === user.username)[0];
 
-//   expect(JSON.parse(result.body))
-//     .toEqual({ user });
-// });
+  const result = await app.inject(`/users/${(user as any).id}?${stringify(
+    {
+      include: [
+        "age",
+      ],
+    },
+  )}`);
+
+  expect(JSON.parse(result.body))
+    .toEqual({ user });
+});

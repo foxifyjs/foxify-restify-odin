@@ -42,7 +42,7 @@ const operate = (query: typeof Odin, field: string, operator: Operator, value: a
 const and = (query: any, filters: Array<FilterObject | Filter>): any => filters
   .reduce((prev, curr) => prev.where((q: any) => filter(q, curr)), query);
 
-const or = (query: Odin, filters: Array<FilterObject | Filter>): any => filters.reduce(
+const or = (query: any, filters: Array<FilterObject | Filter>): any => filters.reduce(
   (prev, curr, index) => {
     if (index === 0) return prev.where((q: any) => filter(q, curr));
 
@@ -51,14 +51,24 @@ const or = (query: Odin, filters: Array<FilterObject | Filter>): any => filters.
   query,
 );
 
+const has = (query: any, relation: string): any => query.has(relation);
+
 const filter = (model: any, filters: any) => {
   if (filters.and) {
-    if (filters.or) throw new TypeError("filter can only have one of [\"and\", \"or\"]");
+    if (filters.or || filters.has) {
+      throw new TypeError("filter can only have one of [\"and\", \"or\", \"has\"]");
+    }
 
     return and(model, filters.and);
   }
 
-  if (filters.or) return or(model, filters.or);
+  if (filters.or) {
+    if (filters.has) throw new TypeError("filter can only have one of [\"and\", \"or\", \"has\"]");
+
+    return or(model, filters.or);
+  }
+
+  if (filters.has) return has(model, filters.has);
 
   return operate(model, filters.field, filters.operator, filters.value);
 };

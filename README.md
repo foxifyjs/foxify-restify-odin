@@ -84,6 +84,7 @@ interface FilterObject {
 interface Filter {
   and?: Array<FilterObject | Filter>;
   or?: Array<FilterObject | Filter>;
+  has?: string;
 }
 
 interface Query {

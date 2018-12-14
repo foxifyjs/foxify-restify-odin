@@ -1,16 +1,12 @@
 import { Query } from ".";
-import filter from "./builders/filter";
-import include from "./builders/include";
-import limit from "./builders/limit";
-import skip from "./builders/skip";
-import sort from "./builders/sort";
+import { filter, include, limit, skip, sort } from "./builders";
 
-export default (model: any, decoded: Query, single: boolean) => {
+export default (model: any, decoded: Query, single: string | false) => {
   let counter = model;
 
   if (decoded.include) model = include(model, decoded.include);
 
-  if (!single) {
+  if (single === false) {
     if (decoded.filter) {
       model = filter(model, decoded.filter);
       counter = filter(counter, decoded.filter);
@@ -23,7 +19,7 @@ export default (model: any, decoded: Query, single: boolean) => {
     if (decoded.skip) model = skip(model, decoded.skip);
 
     if (decoded.limit) model = limit(model, decoded.limit);
-  }
+  } else model = model.where("id", single);
 
   return { counter, query: model };
 };

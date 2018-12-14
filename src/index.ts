@@ -22,6 +22,7 @@ namespace restify {
   export interface Filter {
     and?: Array<FilterObject | Filter>;
     or?: Array<FilterObject | Filter>;
+    has?: string;
   }
 
   export interface Query {
@@ -79,19 +80,22 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
     },
   };
 
-  const foxifyRestifyOdin: (single?: boolean) => Foxify.Handler = (single = false) =>
-    function foxify_restify_odin(req, res, next) {
+  const name = pluralize(options.name as string, 1);
+
+  const foxifyRestifyOdin: (single?: boolean) => Foxify.Handler = (single = false) => {
+    return function foxify_restify_odin(req, res, next) {
       const parsed = parse((req.url as string).replace(/^.*\?/, ""));
 
       const decoded = Object.assign({}, options.defaults, decoder(parsed));
 
       req.fro = {
         decoded,
-        ...query(model, decoded, single),
+        ...query(model, decoded, single ? req.params[`fro_${name}_id`] : false),
       };
 
       next();
     };
+  };
 
   const router = new Router(`${options.prefix}/${options.name}`);
 
@@ -129,12 +133,10 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
     );
   }
 
-  const name = pluralize(options.name as string, 1);
-
   if (routes.show) {
     router.get(
-      `/:${name}`,
-      // foxifyRestifyOdin(true),
+      `/:fro_${name}_id`,
+      foxifyRestifyOdin(true),
       routes.show.pre as any,
       show(model, options as restify.Options),
       routes.show.post as any,
@@ -144,7 +146,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
 
   if (routes.update) {
     router.patch(
-      `/:${name}`,
+      `/:fro_${name}_id`,
       routes.update.pre as any,
       update(model, options as restify.Options),
       routes.update.post as any,
@@ -154,7 +156,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
 
   if (routes.delete) {
     router.delete(
-      `/:${name}`,
+      `/:fro_${name}_id`,
       routes.delete.pre as any,
       deleteController(model, options as restify.Options),
       routes.delete.post as any,
