@@ -38,7 +38,7 @@
     "qs": "^6.6.0"
   },
   "peerDependencies": {
-    "@foxify/odin": ">=0.7.0",
+    "@foxify/odin": ">=0.7.4",
     "foxify": ">=0.10.20"
   },
   "devDependencies": {
