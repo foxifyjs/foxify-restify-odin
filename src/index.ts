@@ -1,4 +1,5 @@
 import * as Odin from "@foxify/odin";
+import * as DB from "@foxify/odin/dist/DB";
 import * as Foxify from "foxify";
 import { Router } from "foxify/framework/routing";
 import * as pluralize from "prototyped.js/es6/string/pluralize/method";
@@ -19,10 +20,17 @@ namespace restify {
     value: string | number | boolean | any[] | object | Date;
   }
 
+  export interface Has {
+    relation: string;
+    filter: Filter;
+    operator?: DB.Operator;
+    count?: number;
+  }
+
   export interface Filter {
     and?: Array<FilterObject | Filter>;
     or?: Array<FilterObject | Filter>;
-    has?: string;
+    has?: string | Has;
   }
 
   export interface Query {
@@ -90,7 +98,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
 
       req.fro = {
         decoded,
-        ...query(model, decoded, single ? req.params[`fro_${name}_id`] : false),
+        ...query(model, decoded, single ? req.params[name] : false),
       };
 
       next();
@@ -135,7 +143,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
 
   if (routes.show) {
     router.get(
-      `/:fro_${name}_id`,
+      `/:${name}`,
       foxifyRestifyOdin(true),
       routes.show.pre as any,
       show(model, options as restify.Options),
@@ -146,7 +154,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
 
   if (routes.update) {
     router.patch(
-      `/:fro_${name}_id`,
+      `/:${name}`,
       routes.update.pre as any,
       update(model, options as restify.Options),
       routes.update.post as any,
@@ -156,7 +164,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
 
   if (routes.delete) {
     router.delete(
-      `/:fro_${name}_id`,
+      `/:${name}`,
       routes.delete.pre as any,
       deleteController(model, options as restify.Options),
       routes.delete.post as any,

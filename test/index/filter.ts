@@ -366,3 +366,35 @@ it("Should filter [has]", async () => {
       meta: { limit: 10, page: 0, count: users.length, total_count: users.length },
     });
 });
+
+it("Should filter [whereHas]", async () => {
+  expect.assertions(1);
+
+  const app = new Foxify();
+
+  app.use(restify(User));
+
+  const result = await app.inject(`/users?${stringify(
+    {
+      filter: {
+        has: {
+          relation: "age",
+          filter: {
+            field: "age",
+            operator: "gte",
+            value: 25,
+          },
+        },
+      },
+    },
+  )}`);
+
+  const users = ITEMS
+    .filter(({ username }) => ITEMS2.any(item => item.username === username && item.age >= 25));
+
+  expect(JSON.parse(result.body))
+    .toEqual({
+      users,
+      meta: { limit: 10, page: 0, count: users.length, total_count: users.length },
+    });
+});

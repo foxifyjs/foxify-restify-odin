@@ -9,16 +9,22 @@ export default (model: typeof Odin, options: Options): Foxify.Handler => {
   const name = pluralize(options.name, 1);
 
   return async function foxify_restify_odin_update(req, res, next) {
-    const id = req.params[`fro_${name}_id`];
+    const id = req.params[name];
 
-    const item = await model.find(id);
+    let item: Odin;
 
-    if (!item) {
-      const error = new Error(`${capitalize(name)} not found`);
+    if (Odin.isOdin(id)) {
+      item = id;
+    } else {
+      item = await model.find(id);
 
-      (error as any).code = 404;
+      if (!item) {
+        const error = new Error(`${capitalize(name)} not found`);
 
-      throw error;
+        (error as any).code = 404;
+
+        throw error;
+      }
     }
 
     const body = req.body[name];
