@@ -12,6 +12,10 @@
 
 ---
 
+## [v1.5.0](https://github.com/foxifyjs/foxify-restify-odin/releases/tag/v1.5.0) - *(2018-12-16)*
+
+- :zap: Added `Odin`'s `whereHas` compatibility
+
 ## [v1.4.0](https://github.com/foxifyjs/foxify-restify-odin/releases/tag/v1.4.0) - *(2018-12-15)*
 
 - :zap: Added `has` to filters
