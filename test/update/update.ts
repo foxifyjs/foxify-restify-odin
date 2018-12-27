@@ -42,16 +42,31 @@ Odin.Connect({
   },
 });
 
+const Types = Odin.Types;
+
+class User extends Odin {
+  public static schema = {
+    email: Types.string.email.required,
+    username: Types.string.alphanum.min(3).required,
+    age: Types.number.min(18).required,
+    name: {
+      first: Types.string.min(3).required,
+      last: Types.string.min(3),
+    },
+  };
+}
+
 beforeAll((done) => {
-  Odin.DB.collection(TABLE).insert(ITEMS, (err) => {
+  User.insert(ITEMS, (err) => {
     if (err) throw err;
 
-    Odin.DB.collection(TABLE).get((err2, items) => {
+    User.lean().get((err2, items: any[]) => {
       if (err2) throw err2;
 
       ITEMS.length = 0;
 
-      ITEMS.push(...items);
+      ITEMS.push(...items.map(item => ({
+        ...item, created_at: item.created_at.toISOString() })));
 
       done();
     });
@@ -77,20 +92,6 @@ afterAll((done) => {
     done();
   });
 });
-
-const Types = Odin.Types;
-
-class User extends Odin {
-  public static schema = {
-    email: Types.string.email.required,
-    username: Types.string.alphanum.min(3).required,
-    age: Types.number.min(18).required,
-    name: {
-      first: Types.string.min(3).required,
-      last: Types.string.min(3),
-    },
-  };
-}
 
 it("Should update the user by the given id", async () => {
   expect.assertions(2);

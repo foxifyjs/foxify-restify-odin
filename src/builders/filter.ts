@@ -40,14 +40,25 @@ const operate = (query: typeof Odin, field: string, operator: Operator, value: a
   }
 };
 
-const and = (query: any, filters: Array<FilterObject | Filter>, had: boolean): any => filters
-  .reduce((prev, curr) => prev.where((q: any) => filter(q, curr, had)), query);
+const and = (
+  query: any, filters: Array<FilterObject | Filter>, had: boolean, level: number,
+): any => filters
+  .reduce(
+    (prev, curr) => {
+      if ((curr as any).has) return filter(prev, curr, had, level);
 
-const or = (query: any, filters: Array<FilterObject | Filter>, had: boolean): any => filters.reduce(
+      return prev.where((q: any) => filter(q, curr, had, level + 1));
+    },
+    query,
+  );
+
+const or = (
+  query: any, filters: Array<FilterObject | Filter>, had: boolean, level: number,
+): any => filters.reduce(
   (prev, curr, index) => {
-    if (index === 0) return prev.where((q: any) => filter(q, curr, had));
+    if (index === 0) return prev.where((q: any) => filter(q, curr, had, level + 1));
 
-    return prev.orWhere((q: any) => filter(q, curr, had));
+    return prev.orWhere((q: any) => filter(q, curr, had, level + 1));
   },
   query,
 );
@@ -66,23 +77,24 @@ const has = (
   );
 };
 
-const filter = (model: any, filters: any, had = false) => {
+const filter = (model: any, filters: any, had = false, level = 0) => {
   if (filters.and) {
     if (filters.or || filters.has) {
       throw new TypeError("filter can only have one of [\"and\", \"or\", \"has\"]");
     }
 
-    return and(model, filters.and, had);
+    return and(model, filters.and, had, level);
   }
 
   if (filters.or) {
     if (filters.has) throw new TypeError("filter can only have one of [\"and\", \"or\", \"has\"]");
 
-    return or(model, filters.or, had);
+    return or(model, filters.or, had, level);
   }
 
   if (filters.has) {
     if (had) throw new Error("Can't use \"has\" inside has");
+    if (level !== 0) throw new Error("Can't use \"has\" at this level");
 
     return has(model, filters.has);
   }

@@ -12,6 +12,10 @@
 
 ---
 
+## [v1.6.0](https://github.com/foxifyjs/foxify-restify-odin/releases/tag/v1.6.0) - *(2018-12-28)*
+
+- :star2: Added ability to use `has` filter in the first `and` level
+
 ## [v1.5.0](https://github.com/foxifyjs/foxify-restify-odin/releases/tag/v1.5.0) - *(2018-12-16)*
 
 - :zap: Added `Odin`'s `whereHas` compatibility

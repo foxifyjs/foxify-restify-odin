@@ -42,7 +42,7 @@ Easily restify odin databases
 
 - [Node.js](https://nodejs.org/en/download) `8.12` or higher is required.
 - [foxify](https://github.com/foxifyjs/foxify) `0.10.20` or higher is required.
-- [@foxify/odin](https://github.com/foxifyjs/odin) `0.6.0` or higher is required.
+- [@foxify/odin](https://github.com/foxifyjs/odin) `0.8.0` or higher is required.
 
 ### Installation
 
@@ -183,7 +183,7 @@ possible operators:
 qs.stringify({
   include: [
     "relation1",
-    "relation2",
+    "relation2.subRelation1.subRelation2",
   ]
 })
 ```
@@ -218,13 +218,13 @@ qs.stringify({
 
 ## Versioning
 
-We use [SemVer](http://semver.org) for versioning. For the versions available, see the [tags on this repository](https://github.com/foxifyjs/foxify/tags).
+We use [SemVer](http://semver.org) for versioning. For the versions available, see the [tags on this repository](https://github.com/foxifyjs/foxify-restify-odin/tags).
 
 ## Authors
 
 - **Ardalan Amini** - *Owner/Developer* - [@ardalanamini](https://github.com/ardalanamini)
 
-See also the list of [contributors](https://github.com/foxifyjs/foxify/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/foxifyjs/foxify-restify-odin/contributors) who participated in this project.
 
 ## License
 
