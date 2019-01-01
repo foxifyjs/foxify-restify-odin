@@ -328,7 +328,7 @@ it("Should filter (6)", async () => {
     {
       filter: {
         field: "name.first",
-        operator: "lk",
+        operator: "like",
         value: "arda",
       },
     },

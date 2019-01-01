@@ -12,7 +12,7 @@ import query from "./query";
 
 namespace restify {
   export type Operator = "lt" | "lte" | "eq" | "ne" | "gte" | "gt" |
-    "ex" | "in" | "nin" | "bet" | "nbe" | "lk" | "nlk";
+    "exists" | "in" | "nin" | "bet" | "nbe" | "like" | "nlike";
 
   export interface FilterObject {
     field: string;
@@ -42,8 +42,8 @@ namespace restify {
   }
 
   export interface RouteOptions {
-    pre?: Foxify.Handler;
-    post?: Foxify.Handler;
+    pre?: Foxify.Handler | Foxify.Handler[];
+    post?: Foxify.Handler | Foxify.Handler[];
   }
 
   export interface RoutesOptions {
@@ -59,6 +59,7 @@ namespace restify {
     name: string;
     prefix: string;
     defaults: Query;
+    pre?: Foxify.Handler | Foxify.Handler[];
     routes: P extends true ? Partial<RoutesOptions> : RoutesOptions;
   }
 }
@@ -113,6 +114,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
     router.get(
       "",
       foxifyRestifyOdin(),
+      options.pre as any,
       routes.index.pre as any,
       index(options as restify.Options),
       routes.index.post as any,
@@ -124,6 +126,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
     router.get(
       "/count",
       foxifyRestifyOdin(),
+      options.pre as any,
       routes.count.pre as any,
       count(options as restify.Options),
       routes.count.post as any,
@@ -134,6 +137,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
   if (routes.store) {
     router.post(
       "",
+      options.pre as any,
       routes.store.pre as any,
       store(model, options as restify.Options),
       routes.store.post as any,
@@ -145,6 +149,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
     router.get(
       `/:${name}`,
       foxifyRestifyOdin(true),
+      options.pre as any,
       routes.show.pre as any,
       show(model, options as restify.Options),
       routes.show.post as any,
@@ -155,6 +160,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
   if (routes.update) {
     router.patch(
       `/:${name}`,
+      options.pre as any,
       routes.update.pre as any,
       update(model, options as restify.Options),
       routes.update.post as any,
@@ -165,6 +171,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
   if (routes.delete) {
     router.delete(
       `/:${name}`,
+      options.pre as any,
       routes.delete.pre as any,
       deleteController(model, options as restify.Options),
       routes.delete.post as any,
