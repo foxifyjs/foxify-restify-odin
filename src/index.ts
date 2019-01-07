@@ -3,7 +3,7 @@ import * as DB from "@foxify/odin/dist/DB";
 import * as Foxify from "foxify";
 import { Router } from "foxify/framework/routing";
 import * as pluralize from "prototyped.js/es6/string/pluralize/method";
-import { parse } from "qs";
+import { IParseOptions,parse } from "qs";
 import {
   count, delete as deleteController, index, responder, show, store, update,
 } from "./controllers";
@@ -58,6 +58,7 @@ namespace restify {
   export interface Options<P extends boolean = false> {
     name: string;
     prefix: string;
+    qs: IParseOptions;
     defaults: Query;
     routes: P extends true ? Partial<RoutesOptions> : RoutesOptions;
   }
@@ -72,6 +73,10 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
     name: model.toString(),
     prefix: "",
     ...options,
+    qs: {
+      depth: 100,
+      ...(options.qs || {}),
+    },
     defaults: {
       limit: 10,
       skip: 0,
@@ -92,7 +97,7 @@ const restify = (model: typeof Odin, options: Partial<restify.Options<true>> = {
 
   const foxifyRestifyOdin: (single?: boolean) => Foxify.Handler = (single = false) => {
     return function foxify_restify_odin(req, res, next) {
-      const parsed = parse((req.url as string).replace(/^.*\?/, ""));
+      const parsed = parse((req.url as string).replace(/^.*\?/, ""), options.qs);
 
       const decoded = Object.assign({}, options.defaults, decoder(parsed));
 
