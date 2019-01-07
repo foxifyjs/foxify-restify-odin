@@ -3,7 +3,7 @@ import * as DB from "@foxify/odin/dist/DB";
 import * as Foxify from "foxify";
 import { Router } from "foxify/framework/routing";
 import * as pluralize from "prototyped.js/es6/string/pluralize/method";
-import { IParseOptions,parse } from "qs";
+import { IParseOptions, parse } from "qs";
 import {
   count, delete as deleteController, index, responder, show, store, update,
 } from "./controllers";

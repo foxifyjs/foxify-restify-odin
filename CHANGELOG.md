@@ -12,6 +12,10 @@
 
 ---
 
+## [v1.8.0](https://github.com/foxifyjs/foxify-restify-odin/releases/tag/v1.8.0) - *(2019-01-07)*
+
+- :star2: Added ability to modify `qs.parse` options
+
 ## [v1.7.0](https://github.com/foxifyjs/foxify-restify-odin/releases/tag/v1.7.0) - *(2019-01-02)*
 
 - :star2: Added ability to add `pre` handler to all routes

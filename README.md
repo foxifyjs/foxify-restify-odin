@@ -84,7 +84,7 @@ interface FilterObject {
 interface Filter {
   and?: Array<FilterObject | Filter>;
   or?: Array<FilterObject | Filter>;
-  has?: string;
+  has?: string | { relation: string, filter: Filter | FilterObject };
 }
 
 interface Query {
@@ -112,8 +112,9 @@ interface RoutesOptions {
 interface Options {
   name: string;
   prefix: string;
+  qs: QSParseOptions;
   defaults: Query;
-  pre?: Foxify.Handler | Foxify.Handler[];
+  pre: Foxify.Handler | Foxify.Handler[];
   routes: Partial<RoutesOptions>;
 }
 
@@ -162,7 +163,7 @@ qs.stringify({
           },
           {
             field: "email",
-            operator: "ex",
+            operator: "exists",
             value: true,
           },
         ],
@@ -176,7 +177,7 @@ filter can be a single filter object or `and`/`or` of Array\<filter object\>
 
 possible operators:
 
-`lt` | `lte` | `eq` | `ne` | `gte` | `gt` | `ex` | `in` | `nin` | `bet` | `nbe` | `lk` | `nlk`
+`lt` | `lte` | `eq` | `ne` | `gte` | `gt` | `exists` | `in` | `nin` | `bet` | `nbe` | `like` | `nlike`
 
 ### include
 

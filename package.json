@@ -1,6 +1,6 @@
 {
   "name": "foxify-restify-odin",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Easily restify odin databases",
   "author": "Ardalan Amini <ardalanamini22@gmail.com> [https://github.com/ardalanamini]",
   "license": "MIT",
@@ -45,7 +45,7 @@
     "@foxify/odin": "^0.8.0",
     "@foxify/schema": "^1.0.1",
     "@types/body-parser": "^1.17.0",
-    "@types/jest": "^23.3.11",
+    "@types/jest": "^23.3.12",
     "@types/qs": "^6.5.1",
     "body-parser": "^1.18.3",
     "codecov": "^3.1.0",
