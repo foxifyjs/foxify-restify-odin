@@ -73,7 +73,7 @@ app.start();
 
 ```typescript
 type Operator = "lt" | "lte" | "eq" | "ne" | "gte" | "gt" |
-  "ex" | "in" | "nin" | "bet" | "nbe" | "lk" | "nlk";
+  "exists" | "in" | "nin" | "bet" | "nbe" | "like" | "nlike";
 
 interface FilterObject {
   field: string;
@@ -96,8 +96,8 @@ interface Query {
 }
 
 interface RouteOptions {
-  pre?: Foxify.Handler;
-  post?: Foxify.Handler;
+  pre?: Foxify.Handler | Foxify.Handler[];
+  post?: Foxify.Handler | Foxify.Handler[];
 }
 
 interface RoutesOptions {
@@ -113,6 +113,7 @@ interface Options {
   name: string;
   prefix: string;
   defaults: Query;
+  pre?: Foxify.Handler | Foxify.Handler[];
   routes: Partial<RoutesOptions>;
 }
 

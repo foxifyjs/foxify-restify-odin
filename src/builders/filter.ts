@@ -20,7 +20,7 @@ const operate = (query: typeof Odin, field: string, operator: Operator, value: a
     case "gte":
     case "gt":
       return query.where(field, BASIC_OPERATORS[operator], value);
-    case "ex":
+    case "exists":
       if (value === true) return query.whereNotNull(field);
       return query.whereNull(field);
     case "in":
@@ -31,9 +31,9 @@ const operate = (query: typeof Odin, field: string, operator: Operator, value: a
       return query.whereBetween(field, value[0], value[1]);
     case "nbe":
       return query.whereNotBetween(field, value[0], value[1]);
-    case "lk":
+    case "like":
       return query.whereLike(field, value);
-    case "nlk":
+    case "nlike":
       return query.whereNotLike(field, value);
     default:
       throw new TypeError("Unknown operator");
